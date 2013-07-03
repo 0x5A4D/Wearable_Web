@@ -6,7 +6,6 @@ $lwws_url = 'http://weather.livedoor.com/forecast/webservice/json/v1';
 if (isset($_POST['city'])&& $_POST['city']!=""){
     $POSTDATA = $_POST['city'];
     //正しいデータかチェック
-    echo $POSTDATA;
     if(preg_match("/^[0-9]+$/", $POSTDATA)){
         $lwws_url .= '?city='.sprintf("%06d", $POSTDATA);
         $lwws_data = file_get_contents($lwws_url);
@@ -60,6 +59,7 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
         <h1>LWWSリクエスト</h1>
         
         <form action="request_lwws.php" name="CityForm" method="post">
+            <label>都道府県:</label>
             <select name="pref" onchange="Select(this)">
                 <option value="" selected></option>
                 <?php
@@ -69,16 +69,30 @@ if (isset($_POST['city'])&& $_POST['city']!=""){
                 }
                 ?>
             </select>
+            <label>都市:</label>
             <select name="city">
                 <option value=""></option>
             </select>
             <input type="submit" value="送信">
         </form>
+        
         <?php if(isset($POSTDATA)){ ?>
         <h2>レスポンスデータ</h2>
         <pre>
         <?php
-            print_r($lwws_ary);
+            //print_r($lwws_ary);
+           
+            echo '<h3>'.$lwws_ary['location']['prefecture'].' - '.$lwws_ary['location']['city'].'</h3>';
+            echo '<table border="1" cellpadding="2">';
+            echo '<tr><td></td><td>日付</td><td>予報</td><td>最低/最高気温</td><td>画像</td></tr>';
+            foreach($lwws_ary['forecasts'] as $forecasts=>$idx){
+                echo '<tr><td>'.$idx['dateLabel'].'</td>';
+                echo '<td>'.$idx['date'].'</td>';
+                echo '<td>'.$idx['telop'].'</td>';
+                echo '<td>'.$idx['temperature']['min']['celsius'].'/'.$idx['temperature']['max']['celsius'].'</td>';
+                echo '<td><img src="'.$idx['image']['url'].'" ></td></tr>';
+            }
+            echo '</table>';
         } ?>
         </pre>
     </body>
