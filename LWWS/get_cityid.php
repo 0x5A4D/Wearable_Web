@@ -9,12 +9,15 @@ $XmlFile = 'primary_area.xml';
 
 $xml = simplexml_load_file($XmlFile);
 $ldWeather = $xml->channel->children('ldWeather', TRUE);
+$city_data = array();
 
 foreach ($ldWeather->source->children()->pref as $preftag) {
     foreach ($preftag->city as $citytag){
         $area = $preftag['title'];
         $city = $citytag['title'];
-        $city_data["$area"]["$city"] = (int)$citytag['id'];;
+        $city_data["$area"]["$city"] = (int)$citytag['id'];
+      
+        file_put_contents('./city_data.dat', serialize($city_data));
     }
 }
 ?>
